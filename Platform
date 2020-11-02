@@ -1,0 +1,94 @@
+import pygame
+import random
+import os
+
+Width=800
+Height=600
+FPS=30
+
+#Define Colors
+White=(255,255,255)
+Black=(0,0,0)
+Red=(255,0,0)
+Green=(0,255,0)
+Blue=(0,0,255)
+
+#Asset Folders
+game_folder=os.path.dirname(__file__)
+img_folder=os.path.join(game_folder, "img")
+
+#Player Class
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image=pygame.Surface((50,50))
+        self.image.fill(Red)
+        self.rect=self.image.get_rect()
+        self.rect.center=(Width /2, Height /2)
+        self.y_speed=5
+
+    def update(self):
+        #Returns a list of all pressed keys
+        keystate=pygame.key.get_pressed()
+
+        #Checks to see which keys were in the list (or pressed)
+        if keystate[pygame.K_RIGHT]:
+            self.rect.x+=5
+        if keystate[pygame.K_LEFT]:
+            self.rect.x+=-5
+        if keystate[pygame.K_UP]:
+            self.rect.y+=-5
+        if keystate[pygame.K_DOWN]:
+            self.rect.y+=5
+
+#Platform Class
+class Platform(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image=pygame.Surface((100,20))
+        self.image.fill(Green)
+        self.rect=self.image.get_rect()
+        self.rect.center=(Width /2, Height /2)
+
+    def update(self):
+        self.rect.x-=5
+        if self.rect.right<0:
+            self.rect.left=Width     
+
+#Initialize Variables
+pygame.init()
+pygame.mixer.init()
+screen=pygame.display.set_mode((Width, Height))
+pygame.display.set_caption("My Game")
+
+clock=pygame.time.Clock()
+
+#Sprite Groups
+all_sprites=pygame.sprite.Group()
+player=Player()
+all_sprites.add(player)
+platform=Platform()
+all_sprites.add(platform)
+
+#Game Loop
+running=True
+while running:
+    clock.tick(FPS)
+
+    #Process Ecvents
+    for event in pygame.event.get():
+        if event.type==pygame.QUIT:
+            running=False
+
+    #Update
+    all_sprites.update()
+
+    #Draw
+    screen.fill(Black)
+    all_sprites.draw(screen)
+
+    #Flip After Drawing
+    pygame.display.flip()
+
+pygame.quit()
+                        
